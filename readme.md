@@ -1,0 +1,1 @@
+tutorial to configure the email to send messages https://www.youtube.com/watch?v=g_j6ILT-X0k

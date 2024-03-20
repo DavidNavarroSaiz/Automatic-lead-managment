@@ -1,0 +1,7 @@
+python-dotenv
+fastapi
+pydantic
+uvicorn
+pylint
+pytest
+black
