@@ -45,7 +45,7 @@ async def process_lead(lead_data: dict):
         lead_message = lead_data.get("lead")
         if not lead_message:
             raise HTTPException(status_code=422, detail="Lead message not found in payload")
-
+        print("Processing the lead")
         # Process lead message with GPT processor
         gpt_answer = processor.process_data(lead_message)
         structured_data = json.loads(gpt_answer)
