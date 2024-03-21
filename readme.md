@@ -5,9 +5,9 @@
 
 
 
-<h3 align="center">Automatic lead managment</h3>
+<h1 align="center">Automatic lead managment</h1>
 
-# Architecture of the solution
+### Architecture of the solution
 
 <p align="center">
   <img src="./architecture.png" alt="Architecture">
