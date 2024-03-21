@@ -7,6 +7,11 @@
 
 <h3 align="center">Automatic lead managment</h3>
 
+# Architecture of the solution
+
+<p align="center">
+  <img src="./architecture.png" alt="Architecture">
+</p>
 
 
 
