@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException
-import random
-import requests
+from fastapi import FastAPI
 from requests.exceptions import Timeout
 from src.hubspot import HubSpotClient
+import random
+import requests
+import uvicorn
 
 hubspot_client = HubSpotClient()
 
@@ -151,3 +152,6 @@ async def generate_lead():
         return {"message": f"Request timeout"}
     except Exception as e:
         return {"message": f"Failed to send lead: {str(e)}"}
+# Run FastAPI app
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8001)
