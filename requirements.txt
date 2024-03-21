@@ -5,3 +5,7 @@ uvicorn
 pylint
 pytest
 black
+openai
+smtplib
+email
+twilio
