@@ -1,10 +1,8 @@
-from pydantic import BaseModel
-from typing import List
 from fastapi import FastAPI, HTTPException
 import random
 import requests
 from requests.exceptions import Timeout
-from hubspot import HubSpotClient
+from src.hubspot import HubSpotClient
 
 hubspot_client = HubSpotClient()
 
@@ -34,12 +32,12 @@ lead_messages = [
 ]
 
 response_messages =[
-    "Hi,Thank you for getting back to me. I'm particularly interested in understanding how your product integrates with existing project management tools. Could you provide more details on its compatibility with platforms like Asana or Trello? Additionally, I'd like to know about any customization options available to tailor the product to our specific project workflows.Looking forward to your insights.Best regards, {name}",
-    "Hello,Appreciate your response. Before proceeding further, I'm keen to learn about the pricing structure of your product, especially if there are any tiered plans or additional costs for scaling as our business grows. Additionally, could you elaborate on any enterprise-level features or support options available? Understanding these aspects will help us evaluate the suitability of your product for our long-term needs.Thanks in advance for your assistance.Best regards, {name}",
-    "Hi there,Thanks for reaching out. One aspect I'm particularly interested in is how your product handles data security, especially regarding sensitive project information. Could you provide insights into the encryption methods used and any compliance certifications your platform adheres to? Additionally, I'd like to know about integration capabilities with other tools we use, such as Slack and Google Workspace.Looking forward to hearing from you.Best regards,{name}",
-    "Hello,Thank you for getting back to me. I'm currently evaluating several options for our project management needs, and pricing is a significant factor in our decision-making process. Along with pricing details, I'm interested in understanding the features included in each plan. Specifically, could you provide a comparison chart outlining the functionalities available in your different pricing tiers? This will help us assess the value proposition of your product.Looking forward to your response.Best regards, {name}",
-    "Hi there,Appreciate your prompt response. Before committing to any purchase, our team prefers to explore the product firsthand to ensure it aligns with our requirements. Could you arrange a demo or provide access to a trial version of your software? This would allow us to assess its usability, interface, and suitability for our project management workflows.Thank you in advance for accommodating our request.Best regards, {name}",
- "Hello,Thank you for reaching out. Pricing is certainly a key consideration for us, but we're also interested in understanding the level of customization and support available with your product. Can you provide insights into any customization options for tailoring the software to our specific project needs? Additionally, I'd like to know about the support channels available and the responsiveness of your customer support team.Looking forward to learning more.Best regards, {name}",
+    "Hi,Thank you for getting back to me. I'm particularly interested in understanding how your product integrates with existing project management tools. Could you provide more details on its compatibility with platforms like Asana or Trello? Additionally, I'd like to know about any customization options available to tailor the product to our specific project workflows.Looking forward to your insights.Best regards, {name} , email: {email}",
+    "Hello,Appreciate your response. Before proceeding further, I'm keen to learn about the pricing structure of your product, especially if there are any tiered plans or additional costs for scaling as our business grows. Additionally, could you elaborate on any enterprise-level features or support options available? Understanding these aspects will help us evaluate the suitability of your product for our long-term needs.Thanks in advance for your assistance.Best regards, {name}, email: {email}",
+    "Hi there,Thanks for reaching out. One aspect I'm particularly interested in is how your product handles data security, especially regarding sensitive project information. Could you provide insights into the encryption methods used and any compliance certifications your platform adheres to? Additionally, I'd like to know about integration capabilities with other tools we use, such as Slack and Google Workspace.Looking forward to hearing from you.Best regards,{name}, email: {email}",
+    "Hello,Thank you for getting back to me. I'm currently evaluating several options for our project management needs, and pricing is a significant factor in our decision-making process. Along with pricing details, I'm interested in understanding the features included in each plan. Specifically, could you provide a comparison chart outlining the functionalities available in your different pricing tiers? This will help us assess the value proposition of your product.Looking forward to your response.Best regards, {name}, email: {email}",
+    "Hi there,Appreciate your prompt response. Before committing to any purchase, our team prefers to explore the product firsthand to ensure it aligns with our requirements. Could you arrange a demo or provide access to a trial version of your software? This would allow us to assess its usability, interface, and suitability for our project management workflows.Thank you in advance for accommodating our request.Best regards, email: {email}",
+ "Hello,Thank you for reaching out. Pricing is certainly a key consideration for us, but we're also interested in understanding the level of customization and support available with your product. Can you provide insights into any customization options for tailoring the software to our specific project needs? Additionally, I'd like to know about the support channels available and the responsiveness of your customer support team.Looking forward to learning more.Best regards, {name}, email: {email}",
 ]
 
 app = FastAPI()
@@ -48,55 +46,93 @@ urlSendLead = "http://localhost:8000/process_lead"
 
 # Endpoint to generate leads with a specific name
 @app.get("/generate_lead_specific_name")
-async def generate_lead_specific_name(name: str):
-    existing_contact = hubspot_client.get_contact_by_name(name)
-    if existing_contact:   
-        print("contact already exist, generating response message ")
+async def generate_lead_specific_name(email: str):
+    """
+    Endpoint to generate leads with a specific email address.
 
+    Args:
+        email (str): The email address for which a lead is to be generated.
+
+    Returns:
+        dict: A dictionary containing the message indicating the lead generation status.
+    """
+
+    existing_contact = hubspot_client.get_contact_by_email(email)
+    # If contact already exists, generate a response message
+    if existing_contact:   
         random_lead_message = random.choice(response_messages)
-        
-        formatted_message = random_lead_message.format(name=name)
-        lead_data = {"lead": formatted_message}
+        print("contact already exist, generating response message ")
+        for name, contact in contact_info.items():
+            if contact["email"] == email:
+                found_name = name       
+                formatted_message = random_lead_message.format(name=found_name, email=email)
+                break
+        else:
+            name = "david"
+            email = "dcnavarros@unal.edu.co"
+            formatted_message = random_lead_message.format(name=found_name, email=email)
 
     else:
+        # If contact doesn't exist, generate an initial lead message
         print("contact dont exist, generating initial lead message ")
-        if name in contact_info:
-            contact = contact_info[name]
-            email = contact["email"]
-            telephone = contact["telephone"]
-        else:
-            # Default email and telephone when the name is not found
-            email = "dcnavarros@unal.edu.co"
-            telephone = "+573007751361"
-            
         random_lead_message = random.choice(lead_messages)
+        for name, contact in contact_info.items():
+            if contact["email"] == email:
+                found_name = name    
+                found_telephone = contact["telephone"]   
+                formatted_message = random_lead_message.format(name=found_name, email=email, telephone=found_telephone)
+                break
         
-        formatted_message = random_lead_message.format(name=name, email=email, telephone=telephone)
-        lead_data = {"lead": formatted_message}
+        else:
+            name = "david"
+            telephone = "+573007751369"
+            formatted_message = random_lead_message.format(name=name, email=email, telephone=telephone)
+
+       
+        
+    lead_data = {"lead": formatted_message}
     try:
+        # Send the lead data via HTTP POST request
+
         response = requests.post(urlSendLead, json=lead_data, timeout=15)  # Timeout set to 15 seconds
         response.raise_for_status()
         return {"message": "Lead generated and sent successfully"}
     except Timeout:
-        raise HTTPException(status_code=500, detail="Request timed out")
+        return {"message": f"Request timeout"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send lead: {str(e)}")
+        return {"message": f"Failed to send lead: {str(e)}"}
+
     
     
 # Endpoint to generate leads with a specific name
 @app.get("/generate_lead")
 async def generate_lead():
+    """
+    Endpoint to generate leads with a random name.
+
+    Returns:
+        dict: A dictionary containing the message indicating the lead generation status.
+    """
     name = random.choice(list(contact_info.keys()))
     existing_contact = hubspot_client.get_contact_by_name(name)
     if existing_contact:   
-        
+        # If contact already exists, generate a response message
+
+        if name in contact_info:
+            contact = contact_info[name]
+            email = contact["email"]
+        else:
+            # Default email when the name is not found
+            email = "dcnavarros@unal.edu.co"
         
         random_lead_message = random.choice(response_messages)
         
-        formatted_message = random_lead_message.format(name=name)
+        formatted_message = random_lead_message.format(name=name, email=email)
         lead_data = {"lead": formatted_message}
 
     else:
+        # If contact doesn't exist, generate an initial lead message
+
         contact = contact_info[name]
         email = contact["email"]
         telephone = contact["telephone"]
@@ -106,10 +142,12 @@ async def generate_lead():
         formatted_message = random_lead_message.format(name=name, email=email, telephone=telephone)
         lead_data = {"lead": formatted_message}
     try:
-        response = requests.post(urlSendLead, json=lead_data, timeout=15)  # Timeout set to 15 seconds
+        # Send the lead data via HTTP POST request
+
+        response = requests.post(urlSendLead, json=lead_data, timeout=30)  # Timeout set to 30 seconds
         response.raise_for_status()
         return {"message": "Lead generated and sent successfully"}
     except Timeout:
-        raise HTTPException(status_code=500, detail="Request timed out")
+        return {"message": f"Request timeout"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send lead: {str(e)}")
+        return {"message": f"Failed to send lead: {str(e)}"}
