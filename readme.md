@@ -1,5 +1,3 @@
-tutorial to configure the email to send messages https://www.youtube.com/watch?v=g_j6ILT-X0k
-
 
 <a name="readme-top"></a>
 
@@ -149,9 +147,9 @@ https://www.youtube.com/watch?v=g_j6ILT-X0k
 
 
 
-### Lead Generator API 
+## Lead Generator API 
 
-in the file main_generator.py you will find methods to generate leads
+in the file main_generator.py you will find methods to generate leads, it tries to emulate the leads process in two or more steps.
 
 1. Run the FastAPI service:
 
@@ -163,62 +161,64 @@ in the file main_generator.py you will find methods to generate leads
     ```
     uvicorn main:app --reload --port 8001
     ```
+in this service you will find 3 important elements:
+contact_info = {name: email, phone }
+lead_messages = ["initial leads"]
+response_messages = ["user responses"]
 
+contact_info:  a list of people that will send the leads, and you will have important information such as email and phone that will be used to manage the lead with hubspot
+
+lead_messages : list of examples of initial leads that a certain person could write, initial leads, include personal information such as phone, email  and gives a partial information about the requirement of the lead.
+
+response_messages: it is a list of examples of responses over the initial leads that users can write, the response messages include more specific questions or specifications of the lead
+
+#### 1. `/generate_lead_specific_name`
+
+- **Method:** GET
+- **Description:** Endpoint to generate leads with a specific email address.
+- **Parameters:**
+  - `email` (str): The email address for which a lead is to be generated.
+- **Returns:**
+  - `dict`: A dictionary containing the message indicating the lead generation status.
+
+#### 2. `/generate_lead`
+
+- **Method:** GET
+- **Description:** Endpoint to generate leads with a random name.
+- **Returns:**
+  - `dict`: A dictionary containing the message indicating the lead generation status.
+
+
+
+
+## Lead Processor API 
+
+in the file main_processor.py you will find a function that joins different processing methods, it goe sover all the required steps to process a lead:
+
+1. data extraction of the lead
+2. automatic, custom and intelligent responses  to sms and email
+3. upload the lead with important information to a CRM (in this case hubspot)
+
+1. Run the FastAPI service:
+
+    ```
+    python main.py
+    ```
+    or using the console:
+
+    ```
+    uvicorn main:app --reload --port 8001
+    ```
+#### `/process_lead`
+
+- **Method:** POST
+- **Description:** Endpoint to receive leads, process them, and send responses via email and SMS.
+- **Request Body:**
+  - `lead_data` (dict): A dictionary containing the lead message.
+    - `lead` (str): The lead message to be processed.
+- **Returns:**
+  - `dict`: A dictionary containing the response message.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Using the docker:
-
-a docker-compose.yml is used to create the database called "my_dev_database" but it can be changed you can also run the following command:
-```
- docker-compose up --build
-```
-
-it will create a docker image with the database and the fastapi app.
-
-
-In both cases you can acces to the fastAPI documentation and usage in the  specified port(typically 8000)
-```
-http://127.0.0.1:8000/docs#
-
-```
-
-# FastAPI Endpoints Documentation
-
-This documentation provides details about the endpoints available in the FastAPI project.
-
-## Run Generator Endpoint
-
-### Endpoint: `/run-generator`
-
-**Description:**  
-Executes the elevator state generator.
-
-## Delete All Rows Endpoint
-
-### Endpoint: `/delete-all-rows`
-**Description:**  
-Deletes all elevator state rows from the database.
-
-HTTP Method: GET
-
-## Get All Rows Endpoint
-### Endpoint: `/get-all-rows`
-**Description:**  
-Retrieves all elevator state rows from the database.
-
-## Save to CSV Endpoint
-
-### Endpoint: `/save-to-csv`
-**Description:**  
-Saves all elevator state rows to a CSV file and allows users to download it.
-
-
-## How to use it to train a ML model:
-
-To enhance the training of a machine learning (ML) model, it is advisable to engage in thoughtful feature engineering. Extracting a diverse set of features, including Time-related Features, Distance Features between floors, Time Spent Features, Directional Features, Time Series Split, Lag Features, Rolling Window Statistics, and more, can significantly contribute to the model's predictive capabilities.
-
-After performing feature engineering, a strategic choice for the target variable is to use demand_floor. By designating demand_floor as the target variable, the model aims to predict the most probable floor in demand, guiding the elevator to rest optimally at that position.
-
-Moreover, to effectively capture the temporal dependencies inherent in the dataset, it is recommended to employ models designed for time series analysis. Autoregressive models like ARIMA or SARIMA provide a robust framework for understanding time series patterns. Alternatively, models like Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM) Networks, with their capacity to capture sequential dependencies, can offer valuable insights into the temporal dynamics of the elevator operations.
